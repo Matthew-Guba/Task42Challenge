@@ -6,6 +6,10 @@
 
 using namespace std;
 
+void clearScreen() {
+    system("cls"); // Очистка экрана для Windows
+}
+
 int getRandomNumber() {
     return rand() % 9 + 1;
 }
@@ -41,9 +45,11 @@ void printTime(int seconds) {
 }
 
 int main() {
-    srand(static_cast<unsigned int>(time(0))); 
+    setlocale(LC_ALL, "Russian");
+    srand(time(0));
 
     int numExamples = 0;
+    int maxErrors = 0;
     string userName;
     int languageChoice = 0;
 
@@ -57,11 +63,38 @@ int main() {
         cin >> languageChoice;
     }
 
-    cout << (languageChoice == 1 ? "Enter the number of examples: " : "Введите количество примеров: ");
+    if (languageChoice == 1) {
+        cout << "Enter the number of examples: ";
+    }
+    else {
+        cout << "Введите количество примеров: ";
+    }
     cin >> numExamples;
     while (numExamples <= 0) {
-        cout << (languageChoice == 1 ? "Invalid input. Please enter a positive number: " : "Некорректный ввод. Введите положительное число: ");
+        if (languageChoice == 1) {
+            cout << "Invalid input. Please enter a positive number: ";
+        }
+        else {
+            cout << "Некорректный ввод. Введите положительное число: ";
+        }
         cin >> numExamples;
+    }
+
+    if (languageChoice == 1) {
+        cout << "Enter the maximum number of errors allowed: ";
+    }
+    else {
+        cout << "Введите максимальное количество допустимых ошибок: ";
+    }
+    cin >> maxErrors;
+    while (maxErrors < 0) {
+        if (languageChoice == 1) {
+            cout << "Invalid input. Please enter a non-negative number: ";
+        }
+        else {
+            cout << "Некорректный ввод. Введите неотрицательное число: ";
+        }
+        cin >> maxErrors;
     }
 
     int errors = 0;
@@ -77,8 +110,9 @@ int main() {
         int userAnswer;
         bool isCorrect = false;
 
-        while (!isCorrect) {
-            cout << num1 << " " << op1 << " " << num2 << " " << op2 << " " << num3 << " = ";
+        while (!isCorrect && errors < maxErrors) {
+            cout << (languageChoice == 1 ? "Example " : "Пример ") << i + 1 << "/" << numExamples << ": "
+                << num1 << " " << op1 << " " << num2 << " " << op2 << " " << num3 << " = ";
             cin >> userAnswer;
 
             if (userAnswer == correctResult) {
@@ -87,23 +121,40 @@ int main() {
             }
             else {
                 cout << (languageChoice == 1 ? "Incorrect. Try again." : "Неправильно. Попробуйте снова.") << endl;
-                if (!isCorrect) errors++; 
+                errors++;
             }
+        }
+
+        if (errors >= maxErrors) {
+            cout << (languageChoice == 1 ? "You have reached the maximum number of errors. Game over."
+                : "Вы достигли максимального количества ошибок. Игра окончена.") << endl;
+            break;
         }
     }
 
-    time_t endTime = time(nullptr); 
+    time_t endTime = time(nullptr);
     int totalTime = static_cast<int>(endTime - startTime);
 
-    
-    cout << (languageChoice == 1 ? "Total time: " : "Общее время: ");
+    if (languageChoice == 1) {
+        cout << "Total time: ";
+    }
+    else {
+        cout << "Общее время: ";
+    }
     printTime(totalTime);
+
     cout << (languageChoice == 1 ? "Errors: " : "Ошибок: ") << errors << endl;
 
+    if (languageChoice == 1) {
+        cout << "Do you want to try again? (y/n): ";
+    }
+    else {
+        cout << "Хотите попробовать снова? (y/n): ";
+    }
     char repeatChoice;
-    cout << (languageChoice == 1 ? "Do you want to try again? (y/n): " : "Хотите попробовать снова? (y/n): ");
     cin >> repeatChoice;
     if (repeatChoice == 'y' || repeatChoice == 'Y') {
+        clearScreen();
         main();
     }
 
